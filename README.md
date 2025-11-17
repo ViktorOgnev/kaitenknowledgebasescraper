@@ -34,11 +34,17 @@ docker run --rm -it -v $PWD:/app python /bin/bash
 cd app
 ```
 
-4. **Запустить скрипт:**
+4. **Установить зависимости скрипта:**
+
+```bash
+pip install -r requirements.txt
+```
+5. **Запустить скрип:**
 
 ```bash
 python scrape_docs.py
 ```
+
 
 После завершения работы скрипта можно выйти из контейнера командой:
 
