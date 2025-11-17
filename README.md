@@ -31,6 +31,7 @@ cd путь/к/папке/со/скаппингом
 ### Установить claude-code или openai codex:
 
 https://code.claude.com/docs/en 
+
 https://developers.openai.com/codex/cli/
 
 Готово! Теперь:
