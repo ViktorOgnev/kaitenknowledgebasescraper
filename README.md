@@ -1,56 +1,60 @@
-````markdown
-# Запуск скрипта `scrape_docs.py` в Docker
 
-Этот проект использует Docker-контейнер с Python для запуска скрипта `scrape_docs.py` в изолированной среде.
 
-## Предварительные требования
+## **1. Установка Docker**
 
-- Установленный [Docker](https://www.docker.com/)
-- Файл `scrape_docs.py` находится в текущей директории проекта
+**Windows / Mac / Linux:**
+[https://docs.docker.com/get-docker/](https://docs.docker.com/get-docker/)
 
-## Команды для запуска
+---
 
-1. **Скачать официальный образ Python:**
+## **2. Запуск скрипта одной командой**
 
-```bash
-docker pull python
-````
-
-2. **Запустить контейнер и примонтировать текущую директорию как `/app`:**
+⚠️ Выполните в директории, где лежат `scrape_docs.py` и `requirements.txt`.
 
 ```bash
-docker run --rm -it -v $PWD:/app python /bin/bash
+docker run --rm -it -v "$PWD":/app python /bin/bash -c "cd /app && pip install -r requirements.txt && python scrape_docs.py"
 ```
 
-* `--rm` — удалить контейнер после выхода
-* `-it` — интерактивный режим с терминалом
-* `-v $PWD:/app` — примонтировать текущую директорию в контейнер по пути `/app`
-* `python` — используемый образ
-* `/bin/bash` — оболочка внутри контейнера
+После выполнения все результаты останутся у вас в текущей папке (на хосте, не в контейнере).
 
-3. **Внутри контейнера перейти в директорию приложения:**
+---
+
+## **3. Перейти в папку, куда скрипт положил данные (1 строка)**
 
 ```bash
-cd app
+cd путь/к/папке/со/скаппингом
 ```
 
-4. **Установить зависимости скрипта:**
+(Если скрипт кладёт в `output/`, то просто `cd output`.)
+
+---
+
+## **4. Запуск Claude в директории проекта (1 строка)**
 
 ```bash
-pip install -r requirements.txt
+npx @anthropic-ai/claude-code
 ```
-5. **Запустить скрип:**
+
+Документация:
+[https://docs.anthropic.com/en/docs/claude-code](https://docs.anthropic.com/en/docs/claude-code)
+
+---
+
+## **5. Запуск OpenAI Codex / Code Interpreter в папке (1 строка)**
 
 ```bash
-python scrape_docs.py
+npx openai dev
 ```
 
+Документация:
+[https://platform.openai.com/docs/guides/dev](https://platform.openai.com/docs/guides/dev)
 
-После завершения работы скрипта можно выйти из контейнера командой:
+---
 
-```bash
-exit
-```
+Готово! Теперь:
 
-```
-```
+* Docker запускает всё **одной командой**
+* Скрипт сохраняет результаты **в вашу локальную папку**
+* Claude или OpenAI Codex могут работать **прямо внутри этой папки**, анализировать файлы, отвечать на вопросы и помогать вам дальше. Просто пишем вопросы как в поддержку и получаем ответы по функционалу
+
+
