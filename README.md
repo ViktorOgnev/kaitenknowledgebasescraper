@@ -27,29 +27,11 @@ cd путь/к/папке/со/скаппингом
 
 (Если скрипт кладёт в `output/`, то просто `cd output`.)
 
----
 
-## **4. Запуск Claude в директории проекта (1 строка)**
+### Установить claude-code или openai codex:
 
-```bash
-npx @anthropic-ai/claude-code
-```
-
-Документация:
-[https://docs.anthropic.com/en/docs/claude-code](https://docs.anthropic.com/en/docs/claude-code)
-
----
-
-## **5. Запуск OpenAI Codex / Code Interpreter в папке (1 строка)**
-
-```bash
-npx openai dev
-```
-
-Документация:
-[https://platform.openai.com/docs/guides/dev](https://platform.openai.com/docs/guides/dev)
-
----
+https://code.claude.com/docs/en 
+https://developers.openai.com/codex/cli/
 
 Готово! Теперь:
 
