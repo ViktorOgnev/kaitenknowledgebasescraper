@@ -161,7 +161,8 @@ class KaitenExporter:
         lines.append("")
 
         # Описание
-        description = card.get('description', '').strip()
+        description = card.get('description') or ''
+        description = description.strip() if isinstance(description, str) else ''
         if description:
             lines.append("## 📝 Описание")
             lines.append("")
@@ -296,8 +297,8 @@ class KaitenExporter:
             # Получаем комментарии
             comments = self.get_paginated(f"/cards/{card_id}/comments")
 
-            # Получаем чек-листы
-            checklists = self.get_paginated(f"/cards/{card_id}/checklists")
+            # Чек-листы уже есть в объекте карточки
+            checklists = card.get('checklists', [])
 
             # Форматируем в Markdown
             markdown = self.format_card_to_markdown(card, comments, checklists)
