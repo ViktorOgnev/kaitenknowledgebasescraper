@@ -2,3 +2,5 @@ out*/
 pdfconvert
 .DS_Store
 *.zip
+export*/
+*bitrix.md

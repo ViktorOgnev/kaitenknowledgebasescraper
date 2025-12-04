@@ -1,0 +1,105 @@
+# Базовая конфигурация CRM в Kaiten
+# Пример: простая настройка CRM с лидами
+
+version: 1.0
+
+kaiten:
+  domain: ${env:KAITEN_DOMAIN}
+  token: ${env:KAITEN_TOKEN}
+
+# Пользовательские поля
+custom_properties:
+  - name: Клиент
+    type: catalog
+    catalog_fields:
+      - name: Название компании
+        required: true
+      - name: ИНН
+      - name: Контактное лицо
+      - name: Телефон
+      - name: Email
+      - name: Адрес
+
+  - name: Источник лида
+    type: select
+    settings:
+      options:
+        - Сайт
+        - Реклама VK
+        - Реклама Яндекс
+        - Холодный звонок
+        - Рекомендация
+
+  - name: Бюджет
+    type: number
+
+  - name: Следующее касание
+    type: date
+
+# Метки
+tags:
+  - name: Срочно
+    color: "#FF0000"
+  - name: Горячий лид
+    color: "#FF6600"
+  - name: B2B
+    color: "#0066FF"
+  - name: B2C
+    color: "#00CC66"
+
+# Типы карточек
+card_types:
+  - name: Лид
+    color: "#FFD700"
+  - name: Встреча
+    color: "#9370DB"
+  - name: Задача
+    color: "#20B2AA"
+
+# Пространства и доски
+spaces:
+  - name: CRM
+    access: private
+    boards:
+      - name: Воронка лидов
+        description: Основная воронка продаж
+        columns:
+          - name: Новые лиды
+            type: queue
+          - name: Первый контакт
+            type: in_progress
+          - name: Отправлено КП
+            type: in_progress
+          - name: Переговоры
+            type: in_progress
+          - name: Закрыто успешно
+            type: done
+          - name: Отказ
+            type: done
+        lanes:
+          - name: Менеджер 1
+          - name: Менеджер 2
+          - name: Менеджер 3
+
+# Автоматизации
+automations:
+  - name: Автоназначение при взятии в работу
+    space: CRM
+    trigger: card_moved_to
+    conditions:
+      column: Первый контакт
+    actions:
+      - type: set_owner
+        value: event_author
+
+  - name: Добавление срочности через 3 дня
+    space: CRM
+    trigger: time_based
+    conditions:
+      days_in_column: 3
+      column: Отправлено КП
+    actions:
+      - type: add_tag
+        value: Срочно
+      - type: add_comment
+        value: "⚠️ Прошло 3 дня, пора дожимать клиента!"

@@ -1,0 +1,21 @@
+# Минимальная конфигурация - быстрый старт
+# Создаёт одно пространство с доской
+
+version: 1.0
+
+kaiten:
+  domain: ${env:KAITEN_DOMAIN}
+  token: ${env:KAITEN_TOKEN}
+
+spaces:
+  - name: Мой проект
+    access: private
+    boards:
+      - name: Задачи
+        columns:
+          - name: To Do
+            type: queue
+          - name: In Progress
+            type: in_progress
+          - name: Done
+            type: done
