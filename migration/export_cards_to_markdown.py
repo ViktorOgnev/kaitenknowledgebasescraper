@@ -8,9 +8,10 @@ import requests
 import time
 import os
 import re
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from datetime import datetime
 import logging
+from urllib.parse import urlparse
 
 logging.basicConfig(
     level=logging.INFO,
@@ -107,6 +108,32 @@ class KaitenExporter:
             offset += limit
 
         return all_data
+
+    def parse_space_url(self, url: str) -> Optional[int]:
+        """Парсинг ID пространства из URL Kaiten"""
+        if not url or not url.strip():
+            return None
+
+        url = url.strip()
+
+        # Пример URL: https://domain.kaiten.ru/space/123456
+        # или: https://domain.kaiten.ru/space/123456/board/789
+
+        # Ищем паттерн /space/{id}
+        match = re.search(r'/space/(\d+)', url)
+        if match:
+            space_id = int(match.group(1))
+            logger.info(f"Распознан ID пространства из URL: {space_id}")
+            return space_id
+
+        # Может быть просто число введено
+        if url.isdigit():
+            space_id = int(url)
+            logger.info(f"Введён ID пространства: {space_id}")
+            return space_id
+
+        logger.warning(f"Не удалось распознать ID пространства из: {url}")
+        return None
 
     def sanitize_filename(self, filename: str) -> str:
         """Очистка имени файла от недопустимых символов"""
@@ -389,36 +416,60 @@ def main():
     # Создаём экспортёр
     exporter = KaitenExporter(domain, token)
 
-    # Получаем список пространств
-    print("Получение списка пространств...")
-    spaces = exporter.get_paginated("/spaces")
-
-    if not spaces:
-        print("❌ Не удалось получить список пространств")
-        return
-
-    print()
-    print("Доступные пространства:")
+    # Спрашиваем ссылку на пространство
+    print("Введите ссылку на пространство или нажмите Enter для выбора из списка:")
+    print("Пример: https://company.kaiten.ru/space/123456")
+    space_url = input("Ссылка (или Enter): ").strip()
     print()
 
-    for i, space in enumerate(spaces, 1):
-        space_id = space.get('id')
-        space_title = space.get('title', 'Без названия')
-        archived = " [АРХИВ]" if space.get('archived') else ""
-        print(f"  {i}. {space_title} (ID: {space_id}){archived}")
+    space_id = None
 
-    print()
-    choice = input("Выберите номер пространства (или введите ID): ").strip()
+    # Пробуем распарсить ссылку
+    if space_url:
+        space_id = exporter.parse_space_url(space_url)
 
-    # Определяем ID пространства
-    try:
-        if choice.isdigit() and int(choice) <= len(spaces):
-            space_id = spaces[int(choice) - 1]['id']
-        else:
-            space_id = int(choice)
-    except:
-        print("❌ Неверный выбор")
-        return
+        if space_id:
+            # Проверяем, что пространство существует
+            space = exporter.get(f"/spaces/{space_id}")
+            if space and not isinstance(space, list):
+                space_title = space.get('title', f'Space_{space_id}')
+                print(f"✓ Найдено пространство: {space_title} (ID: {space_id})")
+                print()
+            else:
+                print(f"❌ Пространство с ID {space_id} не найдено")
+                space_id = None
+
+    # Если не получилось распарсить или пространство не найдено - показываем список
+    if space_id is None:
+        print("Получение списка пространств...")
+        spaces = exporter.get_paginated("/spaces")
+
+        if not spaces:
+            print("❌ Не удалось получить список пространств")
+            return
+
+        print()
+        print("Доступные пространства:")
+        print()
+
+        for i, space in enumerate(spaces, 1):
+            space_id_item = space.get('id')
+            space_title = space.get('title', 'Без названия')
+            archived = " [АРХИВ]" if space.get('archived') else ""
+            print(f"  {i}. {space_title} (ID: {space_id_item}){archived}")
+
+        print()
+        choice = input("Выберите номер пространства (или введите ID): ").strip()
+
+        # Определяем ID пространства
+        try:
+            if choice.isdigit() and int(choice) <= len(spaces):
+                space_id = spaces[int(choice) - 1]['id']
+            else:
+                space_id = int(choice)
+        except:
+            print("❌ Неверный выбор")
+            return
 
     # Опционально: директория для экспорта
     print()
